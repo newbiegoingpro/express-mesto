@@ -23,7 +23,7 @@ module.exports.getCards = (req, res) => {
 
 module.exports.deleteCard = (req, res) => {
   Card.findByIdAndDelete(req.params.cardId)
-    .then(card => res.status(200).send({data: card}))
+    .then(card => res.status(200).send({"message": "Карточка удалена"}))
     .catch((err) => {
       if(!Card[req.params.cardId]){
         res.status(404).send({"message": "Карточки с таким Id нет"})
@@ -36,7 +36,7 @@ module.exports.likeCard = (req, res) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
-    { new: true },)
+    { new: true, select: "likes" },)
     .then(likes => res.status(200).send(likes))
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -50,8 +50,9 @@ module.exports.likeCard = (req, res) => {
 module.exports.removeCardLike = (req, res) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
-    { $pull: { likes: req.user._id } }, // убрать _id из массива
-    { new: true },)
+    { $pull: { likes: req.user._id } },
+    { new: true, select: "likes" },
+    )
     .then(likes => res.status(200).send(likes))
     .catch((err) => {
       if (err.name === 'ValidationError') {

@@ -21,8 +21,9 @@ module.exports.getUsers = (req, res) => {
 };
 
 module.exports.getUser = (req, res) => {
-  User.findById(req.params.userId)
-    .then(user => res.status(200).send({ data: user }))
+  User.findById(req.params.userId, {},
+    { new: true, select: { "name": 1, "about": 1, "avatar": 1} })
+    .then(user => res.status(200).send(user))
     .catch((err) => {
       if (!User[req.params.userId]) {
         res.status(404).send({ "message": "Пользователя с таким Id нет" })
@@ -34,7 +35,8 @@ module.exports.getUser = (req, res) => {
 
 module.exports.updateUser = (req, res) => {
   //const { name, about, avatar } = req.body;
-  User.findByIdAndUpdate(req.user._id, { "name": req.body.name, "about": req.body.about }, { new: true })
+  User.findByIdAndUpdate(req.user._id, { "name": req.body.name, "about": req.body.about },
+    { new: true, select: { "name": 1, "about": 1, "avatar": 1, "_id": 1 } })
     .then(user => res.status(200).send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -49,7 +51,8 @@ module.exports.updateUser = (req, res) => {
 
 module.exports.updatePhoto = (req, res) => {
   //const { name, about, avatar } = req.body;
-  User.findByIdAndUpdate(req.user._id, { "avatar": req.body.avatar }, { new: true })
+  User.findByIdAndUpdate(req.user._id, { "avatar": req.body.avatar },
+    { new: true, select: { "name": 1, "about": 1, "avatar": 1, "_id": 1 } })
     .then(user => res.status(200).send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
