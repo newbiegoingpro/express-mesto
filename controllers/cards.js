@@ -21,18 +21,23 @@ module.exports.getCards = (req, res) => {
 };
 
 module.exports.deleteCard = (req, res) => {
-  Card.findByIdAndDelete(req.params.cardId)
+  const owner = req.user._id;
+  Card.find(req.params.cardId)
     .then((card) => {
       if (!card) {
-        return res.status(404).send({ message: 'Карточки с таким Id нет' });
+        res.status(404).send({ message: 'Карточки с таким Id нет' });
+      } else if (owner === card.owner.toString()) {
+        Card.findByIdAndDelete(req.params.cardId)
+          .then(() => res.status(200).send({ message: 'Карточка удалена' }))
+          .catch(() => res.status(500).send({ message: 'Ошибка на сервере' }));
       }
-      return res.status(200).send({ message: 'Карточка удалена' });
+      return res.status(403).send({ message: 'Удалить можно только свою карточку' });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
         return res.status(400).send({ message: 'Переданы некорректные данные' });
       }
-      return res.status(500).send({ message: 'Ошибка на сервере' });
+      return res.status(500).send({ message: 'Ошибка на сервереt' });
     });
 };
 

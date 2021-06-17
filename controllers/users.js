@@ -1,15 +1,20 @@
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 const User = require('../models/user');
 
 module.exports.createUser = (req, res) => {
-  const { name, about, avatar } = req.body;
-
-  return User.create({ name, about, avatar })
-    .then((user) => res.status(201).send(user))
+  // хешируем пароль
+  bcrypt.hash(req.body.password, 10)
+    .then((hash) => User.create({
+      email: req.body.email,
+      password: hash, // записываем хеш в базу
+    }))
+    .then((user) => res.send(user))
     .catch((err) => {
-      if (err.name === 'ValidationError') {
-        return res.status(400).send({ message: 'Переданы некорректные данные' });
+      if (err.name === 'MongoError' && err.code === 11000) {
+        res.status(403).send({ message: 'Пользователь с такой почтой уже зарегистрирован.' });
       }
-      return res.status(500).send({ message: 'Ошибка на сервере' });
+      res.status(400).send({ message: 'Переданы некорректные данные' });
     });
 };
 
@@ -60,6 +65,37 @@ module.exports.updatePhoto = (req, res) => {
         return res.status(404).send({ message: 'Пользователя с таким Id нет' });
       }
       return res.status(200).send(user);
+    })
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        return res.status(400).send({ message: 'Переданы некорректные данные' });
+      }
+      return res.status(500).send({ message: 'Ошибка на сервере' });
+    });
+};
+
+module.exports.login = (req, res) => {
+  const { email, password } = req.body;
+
+  return User.findUserByCredentials({ email, password })
+    .then((user) => {
+      const token = jwt.sign({ _id: user._id }, 'some-secret-key');
+      res.send({ token });
+    })
+    .catch((err) => {
+      res
+        .status(401)
+        .send({ message: err.message });
+    });
+};
+
+module.exports.getCurrentUser = (req, res) => {
+  User.findOne({ _id: req.user._id })
+    .then((user) => {
+      if (!user) {
+        return res.status(404).send({ message: 'Пользователя с таким Id нет' });
+      }
+      res.status(200).send(user);
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
