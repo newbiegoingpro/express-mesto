@@ -1,5 +1,6 @@
 const express = require('express');
 const { celebrate, Joi } = require('celebrate');
+const { errors } = require('celebrate');
 
 const { PORT = 3000 } = process.env;
 const mongoose = require('mongoose');
@@ -23,23 +24,33 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
 });
 
 app.post('/signin', celebrate({
-  body: {
+  body: Joi.object().keys({
     email: Joi.string().required().email(),
     password: Joi.string().required(),
-  },
+  }),
 }), userControllers.login);
 app.post('/signup', celebrate({
-  body: {
+  body: Joi.object().keys({
     email: Joi.string().required().email(),
     password: Joi.string().required(),
-  },
+  }).unknown(true),
 }), userControllers.createUser);
 app.use(auth);
 app.use('/', userRouter);
 app.use('/', cardRouter);
 app.use('/', blankRouter);
-app.use((err, req, res, next) => {
-  res.status(500).send({ message: 'На сервере произошла ошибка' });
+app.use(errors());
+app.use((err, req, res) => {
+  console.log(err);
+  const { statusCode = 500, message } = err;
+  res
+    .status(statusCode)
+    .send({
+      // проверяем статус и выставляем сообщение в зависимости от него
+      message: statusCode === 500
+        ? 'На сервере произошла ошибкаff'
+        : message,
+    });
 });
 
 app.listen(PORT, () => {
