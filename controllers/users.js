@@ -11,13 +11,16 @@ module.exports.createUser = (req, res, next) => {
       email: req.body.email,
       password: hash, // записываем хеш в базу
     }))
-    .then((user, err) => {
-      if (err.name === 'MongoError' && err.code === 11000) {
-        res.status(409).send({ message: 'Пользователь уже зарегистрирован.' });
-      } else if (err.name === 'ValidationError') {
-        throw new BadRequestError('Переданы некорректные данные');
-      }
+    .then((user) => {
       res.send(user);
+    })
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        throw new BadRequestError('Переданы некорректные данные');
+      } else if (err.name === 'MongoError' && err.code === 11000) {
+        res.status(409).send('Пользователь уже зарегистрирован.');
+      }
+      next(err);
     })
     .catch(next);
 };
@@ -30,13 +33,17 @@ module.exports.getUsers = (req, res, next) => {
 
 module.exports.getUser = (req, res, next) => {
   User.findById(req.params.userId)
-    .then((user, err) => {
+    .then((user) => {
       if (!user) {
         throw new NotFoundError('Пользователя с таким Id нет');
-      } else if (err.name === 'CastError') {
-        throw new BadRequestError({ message: 'Переданы некорректные данные' });
       }
       return res.status(200).send(user);
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        throw new BadRequestError('Переданы некорректные данные');
+      }
+      next(err);
     })
     .catch(next);
 };
@@ -44,13 +51,17 @@ module.exports.getUser = (req, res, next) => {
 module.exports.updateUser = (req, res, next) => {
   User.findByIdAndUpdate(req.user._id, { name: req.body.name, about: req.body.about },
     { new: true, runValidators: true })
-    .then((user, err) => {
+    .then((user) => {
       if (!user) {
-        throw new NotFoundError({ message: 'Пользователя с таким Id нет' });
-      } else if (err.name === 'ValidationError') {
-        throw new BadRequestError({ message: 'Переданы некорректные данные' });
+        throw new NotFoundError('Пользователя с таким Id нет');
+      } else {
+        return res.status(200).send(user);
       }
-      return res.status(200).send(user);
+    }).catch((err) => {
+      if (err.name === 'ValidationError') {
+        throw new BadRequestError('Переданы некорректные данные');
+      }
+      next(err);
     })
     .catch(next);
 };
@@ -60,15 +71,15 @@ module.exports.updatePhoto = (req, res, next) => {
     { new: true, runValidators: true })
     .then((user) => {
       if (!user) {
-        throw new NotFoundError({ message: 'Пользователя с таким Id нет' });
+        throw new NotFoundError('Пользователя с таким Id нет');
       }
       return res.status(200).send(user);
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        throw new BadRequestError({ message: 'Переданы некорректные данные' });
+        throw new BadRequestError('Переданы некорректные данные');
       }
-      return res.status(500).send({ message: 'Ошибка на сервере' });
+      next(err);
     })
     .catch(next);
 };
@@ -87,13 +98,17 @@ module.exports.login = (req, res, next) => {
 module.exports.getCurrentUser = (req, res, next) => {
   User.findOne({ _id: req.user._id })
     // eslint-disable-next-line consistent-return
-    .then((user, err) => {
+    .then((user) => {
       if (!user) {
-        throw new NotFoundError({ message: 'Пользователя с таким Id нет' });
-      } else if (err.name === 'ValidationError') {
-        throw new BadRequestError({ message: 'Переданы некорректные данные' });
+        throw new NotFoundError('Пользователя с таким Id нет');
       }
       res.status(200).send(user);
+    })
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        throw new BadRequestError('Переданы некорректные данные');
+      }
+      next(err);
     })
     .catch(next);
 };

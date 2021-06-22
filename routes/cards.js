@@ -6,7 +6,7 @@ const {
 
 router.post('/cards', celebrate({
   body: Joi.object().keys({
-    name: Joi.string(),
+    name: Joi.string().required(),
     link: Joi.string().required(),
   }),
 }), createCard);
