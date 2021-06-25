@@ -7,6 +7,7 @@ const mongoose = require('mongoose');
 
 const app = express();
 const bodyParser = require('body-parser');
+const { requestLogger, errorLogger } = require('./middlewares/logger');
 const userRouter = require('./routes/users');
 const cardRouter = require('./routes/cards');
 const blankRouter = require('./routes/blank');
@@ -22,7 +23,7 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
   useFindAndModify: false,
   useUnifiedTopology: true,
 });
-
+app.use(requestLogger);
 app.post('/signin', celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
@@ -39,6 +40,7 @@ app.use(auth);
 app.use('/', userRouter);
 app.use('/', cardRouter);
 app.use('/', blankRouter);
+app.use(errorLogger);
 app.use(errors());
 app.use((err, req, res, next) => {
   const { statusCode = 500, message } = err;
