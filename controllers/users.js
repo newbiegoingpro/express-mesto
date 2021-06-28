@@ -4,6 +4,7 @@ const User = require('../models/user');
 const NotFoundError = require('../errors/NotFoundError');
 const BadRequestError = require('../errors/BadRequestError');
 
+const { NODE_ENV, JWT } = process.env;
 module.exports.createUser = (req, res, next) => {
   // хешируем пароль
   bcrypt.hash(req.body.password, 10)
@@ -89,7 +90,7 @@ module.exports.login = (req, res, next) => {
 
   return User.findUserByCredentials({ email, password })
     .then((user) => {
-      const token = jwt.sign({ _id: user._id }, 'some-secret-key');
+      const token = jwt.sign({ _id: user._id }, NODE_ENV === 'development' ? 'some-secret-key' : JWT);
       res.send({ token });
     })
     .catch(next);
