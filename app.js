@@ -51,8 +51,8 @@ app.post('/signup', celebrate({
   }).unknown(true),
 }), userControllers.createUser);
 app.use(auth);
-app.use('/', userRouter);
-app.use('/', cardRouter);
+app.use('/', cors(), userRouter);
+app.use('/', cors(), cardRouter);
 app.use('/', blankRouter);
 app.use(errorLogger);
 app.use(errors());
