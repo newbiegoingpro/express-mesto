@@ -26,7 +26,9 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
   useUnifiedTopology: true,
 });
 app.use(cors());
-app.options('*', cors());
+app.options('*', cors(), (req, res) => {
+  res.status(200).send();
+});
 app.use(requestLogger);
 app.get('/crash-test', () => {
   setTimeout(() => {
