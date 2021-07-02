@@ -26,7 +26,11 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
   useUnifiedTopology: true,
 });
 app.use(cors({
-  origin: '*',
+  origin: [
+    'http://nick.mestoapp.nomoredomains.club',
+    'https://nick.mestoapp.nomoredomains.club',
+    'http://localhost:3000',
+  ],
   credentials: true,
 }));
 app.use(requestLogger);
