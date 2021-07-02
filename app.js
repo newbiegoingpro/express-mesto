@@ -27,8 +27,8 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
 });
 app.use(cors());
 app.options('*', cors({
-  origin: '*',
-  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  origin: 'https://nick.mestoapp.nomoredomains.club',
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
   preflightContinue: false,
   optionsSuccessStatus: 204,
 }));
