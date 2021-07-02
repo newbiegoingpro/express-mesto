@@ -32,6 +32,7 @@ app.use(cors({
     'http://localhost:3000',
   ],
   credentials: true,
+  optionsSuccessStatus: 204,
 }));
 app.use(requestLogger);
 app.get('/crash-test', () => {
