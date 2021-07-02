@@ -1,16 +1,8 @@
 const router = require('express').Router();
 const { celebrate, Joi } = require('celebrate');
-const cors = require('cors');
 const {
   createCard, getCards, deleteCard, likeCard, removeCardLike,
 } = require('../controllers/cards');
-
-const corsSettings = {
-  origin: '*',
-  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-  preflightContinue: false,
-  optionsSuccessStatus: 204,
-};
 
 router.post('/cards', celebrate({
   body: Joi.object().keys({
@@ -19,7 +11,7 @@ router.post('/cards', celebrate({
   }),
 }), createCard);
 
-router.get('/cards', cors(corsSettings), getCards);
+router.get('/cards', getCards);
 
 router.delete('/cards/:cardId', celebrate({
   params: Joi.object().keys({
