@@ -26,12 +26,6 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
   useUnifiedTopology: true,
 });
 app.use(cors());
-app.options('*', cors({
-  origin: 'https://nick.mestoapp.nomoredomains.club',
-  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-  preflightContinue: false,
-  optionsSuccessStatus: 204,
-}));
 app.use(requestLogger);
 app.get('/crash-test', () => {
   setTimeout(() => {
@@ -51,8 +45,8 @@ app.post('/signup', celebrate({
   }).unknown(true),
 }), userControllers.createUser);
 app.use(auth);
-app.use('/', cors(), userRouter);
-app.use('/', cors(), cardRouter);
+app.use('/', userRouter);
+app.use('/', cardRouter);
 app.use('/', blankRouter);
 app.use(errorLogger);
 app.use(errors());
