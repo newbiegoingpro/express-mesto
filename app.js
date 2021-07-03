@@ -18,7 +18,14 @@ const auth = require('./middlewares/auth');
 
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-
+app.use(cors({
+  origin: [
+    'http://localhost:3000',
+    'https://nick.mestoapp.nomoredomains.club',
+    'http://nick.mestoapp.nomoredomains.club',
+  ],
+  credentials: true,
+}));
 mongoose.connect('mongodb://localhost:27017/mestodb', {
   useNewUrlParser: true,
   useCreateIndex: true,
