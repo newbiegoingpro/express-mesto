@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 const User = require('../models/user');
 const NotFoundError = require('../errors/NotFoundError');
 const BadRequestError = require('../errors/BadRequestError');
+const ConflictError = require('../errors/Conflict');
 
 const { NODE_ENV, JWT } = process.env;
 module.exports.createUser = (req, res, next) => {
@@ -19,7 +20,7 @@ module.exports.createUser = (req, res, next) => {
       if (err.name === 'ValidationError') {
         throw new BadRequestError('Переданы некорректные данные');
       } else if (err.name === 'MongoError' && err.code === 11000) {
-        res.status(409).send('Пользователь уже зарегистрирован.');
+        throw new ConflictError('Пользователь уже зарегистрирован.');
       }
       next(err);
     })

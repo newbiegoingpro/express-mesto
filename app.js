@@ -58,15 +58,15 @@ app.use(errorLogger);
 app.use(errors());
 app.use((err, req, res, next) => {
   const { statusCode = 500, message } = err;
-  res.setHeader('Content-Type', 'application/json');
   res
     .status(statusCode)
-    .send(JSON.stringify({
+    .send({
       message: statusCode === 500
         ? 'На сервере произошла ошибка'
         : message,
-    }));
+    });
 });
 
 app.listen(PORT, () => {
+  console.log(`${PORT}`);
 });
