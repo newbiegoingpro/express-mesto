@@ -21,8 +21,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors({
   origin: [
     'http://localhost:3000',
-    'https://nick.mestoapp.nomoredomains.club',
-    'http://nick.mestoapp.nomoredomains.club',
+    'https://mestoAppShvayka.nomoredomains.monster',
+    'http://mestoAppShvayka.nomoredomains.monster',
   ],
   credentials: true,
 }));
