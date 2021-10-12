@@ -21,8 +21,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors({
   origin: [
     'http://localhost:3000',
-    'https://mestoAppShvayka.nomoredomains.monster',
-    'http://mestoAppShvayka.nomoredomains.monster',
+    'https://nick.mestoapp.nomoredomains.club',
+    'http://nick.mestoapp.nomoredomains.club',
+    'https://newbiegoingpro.github.io',
   ],
   credentials: true,
 }));
